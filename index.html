@@ -27,7 +27,7 @@
   }
 
   *,*::before,*::after{box-sizing:border-box}
-  html{background:var(--ground)}
+  html{background:var(--ground);-webkit-text-size-adjust:100%;text-size-adjust:100%}
   html,body{margin:0}
   body{
     min-height:100dvh;
@@ -37,9 +37,11 @@
     -webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
     overflow-x:hidden;
+    overscroll-behavior-y:none;
   }
   img{-webkit-user-drag:none;user-select:none}
   button{font:inherit;color:inherit}
+  button,.sleeve,input{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   ::selection{background:var(--accent);color:#08090b}
 
   /* the room: the cover itself, thrown onto the wall as light */
@@ -84,7 +86,7 @@
   /* masthead */
   .masthead{
     display:flex;align-items:center;justify-content:flex-end;
-    padding:clamp(18px,3.2vh,30px) var(--m) 0;
+    padding:calc(clamp(18px,3.2vh,30px) + env(safe-area-inset-top)) max(var(--m),env(safe-area-inset-right)) 0 max(var(--m),env(safe-area-inset-left));
   }
   .masthead__tools{display:flex;align-items:center;gap:6px}
   .icon-btn{
@@ -276,7 +278,7 @@
   .tracks{
     list-style:none;margin:0;padding:0 2px;
     display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 10px;
-    max-height:min(44vh,330px);overflow:auto;
+    max-height:min(44vh,330px);max-height:min(44svh,330px);overflow:auto;
     scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent;
     overscroll-behavior:contain;
   }
@@ -534,28 +536,49 @@
   @keyframes fadeIn{to{opacity:1}}
   @keyframes dockIn{from{transform:translate(-50%,22px)}to{transform:translate(-50%,0)}}
 
-  /* stacked layout */
+  /* stacked / mobile layout */
   @media (max-width:1079px){
-    .app{display:block;padding-bottom:196px}
-    .stage{display:block;padding:10px var(--m) 0}
+    .app{
+      display:flex;flex-direction:column;
+      min-height:100vh;min-height:100svh;
+      padding-bottom:calc(124px + env(safe-area-inset-bottom));
+    }
+    .stage{
+      flex:1 1 auto;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      gap:clamp(18px,3.2vh,34px);
+      padding:clamp(6px,1.6vh,18px) max(var(--m),env(safe-area-inset-right)) 0 max(var(--m),env(safe-area-inset-left));
+      min-height:0;
+    }
     .deck{
-      width:min(66vw,52vh,420px);
-      margin:12px auto 0;
+      width:min(74vw,42svh,400px);
+      margin:0;flex:none;
       perspective:900px;
     }
-    .platter{transform:scale(1.06)}
-    .platter.is-out{transform:translateX(0) scale(1.18)}
+    .platter{transform:scale(1.03)}
+    .platter.is-out{transform:scale(1.14)}
     .arm{display:none}
-    .liner{max-width:none;margin:clamp(28px,5vh,52px) auto 0}
-    .liner__title{font-size:clamp(3.3rem,15vw,5rem);letter-spacing:.08em}
-    .liner__cue{margin-top:22px}
-    .dock{width:min(880px,calc(100vw - 2 * var(--m)));bottom:calc(12px + env(safe-area-inset-bottom))}
+    .liner{max-width:640px;width:100%;margin:0;text-align:center}
+    .liner__title{font-size:clamp(3rem,11vw,5rem);letter-spacing:.08em}
+    .liner__latin{letter-spacing:.38em;text-indent:.38em}
+    .liner__meta{margin-top:12px}
+    .liner__cue{margin-top:clamp(18px,3vh,30px)}
+    .dock{width:min(880px,calc(100vw - 2 * max(12px,var(--m))));bottom:calc(12px + env(safe-area-inset-bottom))}
   }
   @media (max-width:900px){
     .vol{display:none}
     .tracks{grid-template-columns:1fr 1fr}
   }
   @media (max-width:600px){
+    .app{padding-bottom:calc(112px + env(safe-area-inset-bottom))}
+    .stage{padding:4px 18px 0;gap:clamp(16px,2.6vh,26px)}
+    .deck{width:min(76vw,44svh,380px)}
+    .liner__title{font-size:clamp(2.7rem,12.5vw,4rem);letter-spacing:.06em}
+    .liner__latin{font-size:12px;letter-spacing:.34em;text-indent:.34em}
+    .liner__meta{font-size:12px;margin-top:10px}
+    .liner__cue{display:none}
+    .masthead{padding-left:18px;padding-right:18px}
     .dock{width:calc(100vw - 24px);gap:10px}
     .glass{border-radius:24px}
     .bar{padding:11px 12px 12px}
@@ -563,19 +586,35 @@
     .now__label{display:none}
     .now__title{font-size:14px;font-family:var(--sans);letter-spacing:0}
     .buttons{gap:2px}
-    .ctl{width:34px;height:34px}
-    .play{width:50px;height:50px;margin:0 4px}
+    .ctl{width:36px;height:36px}
+    .play{width:52px;height:52px;margin:0 4px}
     .play svg{width:19px;height:19px}
     .extras{gap:2px}
-    .extras .ctl{width:32px;height:32px}
-    .chip{padding:0 11px}
+    .extras .ctl{width:36px;height:36px}
+    .chip{padding:0;width:40px;height:40px;justify-content:center}
     .chip span{display:none}
     .sheet__inner{padding:13px 10px 10px}
     .sheet__eyebrow{font-size:14px}
-    .tracks{grid-template-columns:1fr;max-height:min(52vh,340px)}
+    .track__btn{padding:10px}
+    .tracks{grid-template-columns:1fr;max-height:min(56svh,380px);-webkit-overflow-scrolling:touch}
     .sheet__hint{display:none}
-    .liner__meta{font-size:13px}
-    .liner__latin{font-size:15px;letter-spacing:.34em}
+  }
+  @media (max-width:1079px) and (max-height:560px) and (orientation:landscape){
+    .app{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+    .stage{
+      flex-direction:row;justify-content:center;
+      gap:clamp(20px,4vw,52px);
+      padding:0 max(20px,env(safe-area-inset-right)) 0 max(20px,env(safe-area-inset-left));
+    }
+    .deck{width:min(46vw,calc(100svh - 190px),340px)}
+    .liner{flex:0 1 430px;max-width:430px;width:auto;text-align:left}
+    .liner__title{font-size:clamp(2.3rem,5.4vw,3.5rem)}
+    .liner__latin{font-size:11px;letter-spacing:.32em;text-indent:0}
+    .liner__meta{margin-top:10px;font-size:12px}
+    .liner__cue{margin-top:12px;height:38px}
+    .masthead{padding-top:calc(6px + env(safe-area-inset-top))}
+    .dock{width:min(760px,calc(100vw - 32px))}
+    .sheet .tracks{max-height:min(34svh,220px)}
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -1247,6 +1286,9 @@
       }
     });
 
+    if (!document.documentElement.requestFullscreen) {
+      $('#fullscreen').style.display = 'none';
+    }
     $('#fullscreen').addEventListener('click', function () {
       if (!document.fullscreenElement) {
         var el = document.documentElement;
